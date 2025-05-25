@@ -1,44 +1,36 @@
 import argparse
 
-from ._internals.file_reader import FileReader
-from ._internals.text_processor import TextProcessor
+from homework.src._internals.count_words import CountWordsMinxinMixin
+from homework.src._internals.parse_args import ParseArgsMixin
+from homework.src._internals.preprocess_lines import PreprocessLinesMixin
+from homework.src._internals.read_all_lines import ReadAllLinesMixin
+from homework.src._internals.split_into_words import SplitIntoWordsMixin
+from homework.src._internals.write_word_counts import WriteWordCountsMixin
 
 
-class ArgumentParser:
+class WordCountApp(
+    ParseArgsMixin,
+    ReadAllLinesMixin,
+    PreprocessLinesMixin,
+    SplitIntoWordsMixin,
+    CountWordsMinxinMixin,
+    WriteWordCountsMixin
+):
     def __init__(self) -> None:
-        self.input = None
-        self.output = None
-        self.parser = None
-
-        self.crear_parser()
-
-    def crear_parser(self):
-
-        self.parser = argparse.ArgumentParser(description="Count words in files.")
-        self.parser.add_argument(
-            "input",
-            type=str,
-            help="Path to the input folder containing files to process",
-        )
-        self.parser.add_argument(
-            "output",
-            type=str,
-            help="Path to output foler",
-        )
+        self.input_folder = None
+        self.output_folder = None
+        self.lines = None
+        self.preprocessed_lines = None
+        self.words = None
 
     def run(self):
-        parsed_args = self.parser.parse_args()
-        self.input = parsed_args.input
-        self.output = parsed_args.output
-        
 
-def main():
-    
-    arg_parser = ArgumentParser().run()
-    
-    file_reader = FileReader(arg_parser.input)
-    text_processor = TextProcessor()
+        self.parse_args()
+        self.read_all_lines()
+        self.preprocess_lines()
+        self.split_into_words()
+        self.count_words()
+        self.write_word_counts()
 
-    lines = file_reader.read_all_lines()
-    preprocessed_lines = text_processor.preprocess_lines(lines)
-    words = text_processor.split_into_words(preprocessed_lines)
+if __name__ == "__main__":
+    WordCountApp().run()
